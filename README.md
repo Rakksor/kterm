@@ -49,9 +49,12 @@ Usage: kterm [OPTIONS]
 For a list of what constitutes valid encodings, check [this list][iana-character-sets] or the list returned by `iconv -l`.
 
 #### Screenshots
-![kterm reversed color scheme][screenshot1] 
-![kterm hidden keyboard][screenshot2]
-![kterm landscape mode][screenshot3]
+  * Light Theme:
+  * ![kterm light color scheme](screenshots/kterm_light.png)
+  * Dark Theme
+  * ![kterm dark color scheme](screenshots/kterm_dark.png)
+  * Split Landscape Keyboard
+  * ![kterm landscape mode with split keyboard](screenshots/kterm_split.png)
 
 #### Changelog
   * *fork* : newly added in this fork: option for setting keyboard height, automatic dark keyboard theme when switching color scheme, flat keyboard theme, improved layouts using only unicode characters and an additional landscape layout with split keyboard
@@ -83,7 +86,4 @@ For a list of what constitutes valid encodings, check [this list][iana-character
 #### License
  * GPL version 3 or (at your option) any later version
 
-[screenshot1]:http://www.fabiszewski.net/kindle-terminal/screenshot_v2_1.png "kterm screenshot"
-[screenshot2]:http://www.fabiszewski.net/kindle-terminal/screenshot_v2_2.png "kterm screenshot"
-[screenshot3]:http://www.fabiszewski.net/kindle-terminal/screenshot_v2_3.png "kterm screenshot"
 [iana-character-sets]: https://www.iana.org/assignments/character-sets/character-sets.txt
