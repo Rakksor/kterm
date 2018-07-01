@@ -49,9 +49,12 @@ Usage: kterm [OPTIONS]
 For a list of what constitutes valid encodings, check [this list][iana-character-sets] or the list returned by `iconv -l`.
 
 #### Screenshots
-![kterm reversed color scheme][screenshot1] 
-![kterm hidden keyboard][screenshot2]
-![kterm landscape mode][screenshot3]
+  * Light Theme:
+  * ![kterm light color scheme](screenshots/kterm_light.png)
+  * Dark Theme
+  * ![kterm dark color scheme](screenshots/kterm_dark.png)
+  * Split Landscape Keyboard
+  * ![kterm landscape mode with split keyboard](screenshots/kterm_split.png)
 
 #### Changelog
   * *fork* : newly added in this fork: option for setting keyboard height, automatic dark keyboard theme when switching color scheme, flat keyboard theme, improved layouts using only unicode characters and an additional landscape layout with split keyboard
@@ -78,12 +81,10 @@ For a list of what constitutes valid encodings, check [this list][iana-character
 * for Kindle build use `--enable-kindle --sysconfdir=/mnt/us/extensions/kterm` configure options. If you are cross-compiling run `make dist-kindle` instead of `make install`. It will create zip package in build directory.
 
 #### Packages 
-* for Kindle Touch/Paperwhite are available at http://www.fabiszewski.net/kindle-terminal/
+* of this fork for Kindle Touch/Paperwhite are in the release section: https://github.com/Rakksor/kterm/releases/tag/v2.6-fork
+* of the original for Kindle Touch/Paperwhite are available at http://www.fabiszewski.net/kindle-terminal/
 
 #### License
  * GPL version 3 or (at your option) any later version
 
-[screenshot1]:http://www.fabiszewski.net/kindle-terminal/screenshot_v2_1.png "kterm screenshot"
-[screenshot2]:http://www.fabiszewski.net/kindle-terminal/screenshot_v2_2.png "kterm screenshot"
-[screenshot3]:http://www.fabiszewski.net/kindle-terminal/screenshot_v2_3.png "kterm screenshot"
 [iana-character-sets]: https://www.iana.org/assignments/character-sets/character-sets.txt
