@@ -26,6 +26,7 @@
 
 /** Global config */
 extern KTconf *conf;
+extern GdkColor key_color;
 
 /** Parser state */
 typedef struct {
@@ -204,6 +205,7 @@ static gboolean parser_button_start(State *state, const gchar **attribute_names,
     key->button = gtk_toggle_button_new();
     gtk_widget_set_name(key->button, "ktermKbButton");
     gtk_widget_set_can_focus(key->button, FALSE);
+    gtk_button_set_relief(GTK_BUTTON(key->button), GTK_RELIEF_NONE);
     state->current_key = key;
     return TRUE;
 }

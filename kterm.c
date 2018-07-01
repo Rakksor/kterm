@@ -162,6 +162,81 @@ static void fontdown(GtkWidget *widget, gpointer terminal) {
     UNUSED(widget);
     resize_font(terminal, FONT_DOWN);
 }
+
+/**
+ * Inject custom styles for
+ * dark and light keyboard
+ */
+void inject_theme(gboolean dark_theme) {
+#if GTK_CHECK_VERSION(3,0,0)
+    GError *error = NULL;
+    GtkCssProvider *provider = gtk_css_provider_new();
+    if (!provider) { return; }
+    if (dark_theme) {
+        gtk_css_provider_load_from_data(provider,
+                                        "#ktermWindow { color: #ffffff; background: #333333; }"
+                                        "#ktermKbButton { color: #ffffff; background: #333333; }"
+                                        "#ktermKbButton:hover { color: #ffffff; background: #333333; }"
+                                        "#ktermKbButton:selected { color: #ffffff; background: #333333; }"
+                                        "#ktermKbButton:disabled { color: #ffffff; background: #333333; }"
+                                        "#ktermKbButton:active { color: #ffffff; background: #333333; }"
+                                    , -1, &error);
+    } else {
+        gtk_css_provider_load_from_data(provider,
+                                        "#ktermWindow { color: #000000; background: #eeeeee; }"
+                                        "#ktermKbButton { color: #000000; background: #eeeeee; }"
+                                        "#ktermKbButton:hover { color: #000000; background: #eeeeee; }"
+                                        "#ktermKbButton:selected { color: #000000; background: #eeeeee; }"
+                                        "#ktermKbButton:disabled { color: #000000; background: #eeeeee; }"
+                                        "#ktermKbButton:active { color: #000000; background: #eeeeee; }"
+                                    , -1, &error);
+    }
+    if G_UNLIKELY(error) {
+        D printf("Style injection failed: %s\n", error->message);
+        g_error_free(error);
+    } else {
+        GdkScreen *screen = gdk_screen_get_default();
+        //gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+    }
+    g_object_unref(provider);
+#endif
+#if !GTK_CHECK_VERSION(3,0,0)
+    if (dark_theme) {
+        gtk_rc_parse_string("style \"kterm-style\" {"
+                            " fg[NORMAL] = \"#ffffff\""
+                            " fg[PRELIGHT] = \"#ffffff\""
+                            " fg[INSENSITIVE] = \"#ffffff\""
+                            " fg[ACTIVE] = \"#ffffff\""
+                            " fg[SELECTED] = \"#ffffff\""
+                            " bg[NORMAL] = \"#333333\""
+                            " bg[PRELIGHT] = \"#333333\""
+                            " bg[INSENSITIVE] = \"#333333\""
+                            " bg[ACTIVE] = \"#333333\""
+                            " bg[SELECTED] = \"#333333\""
+                            "}"
+                            "widget \"ktermWindow\" style \"kterm-style\""
+                            "widget \"*ktermKbButton*\" style \"kterm-style\"");
+    } else {
+        gtk_rc_parse_string("style \"kterm-style\" {"
+                            " fg[NORMAL] = \"#000000\""
+                            " fg[PRELIGHT] = \"#000000\""
+                            " fg[INSENSITIVE] = \"#000000\""
+                            " fg[ACTIVE] = \"#000000\""
+                            " fg[SELECTED] = \"#000000\""
+                            " bg[NORMAL] = \"#eaeaea\""
+                            " bg[PRELIGHT] = \"#eaeaea\""
+                            " bg[INSENSITIVE] = \"#eaeaea\""
+                            " bg[ACTIVE] = \"#eaeaea\""
+                            " bg[SELECTED] = \"#eaeaea\""
+                            "}"
+                            "widget \"ktermWindow\" style \"kterm-style\""
+                            "widget \"*ktermKbButton*\" style \"kterm-style\"");
+    }
+    gtk_rc_reset_styles(gtk_settings_get_for_screen(gdk_screen_get_default()));
+#endif
+}
+
 /**
  * Setup terminal color scheme
  * @param terminal Terminal
@@ -222,11 +297,13 @@ static void set_terminal_colors(GtkWidget *terminal, gboolean scheme) {
             palette = palette_light;
             color_bg = color_white;
             color_fg = color_black;
+            inject_theme(FALSE);
             break;
         case VTE_SCHEME_DARK:
             palette = palette_dark;
             color_bg = color_black;
             color_fg = color_white;
+            inject_theme(TRUE);
             break;
     }
     vte_terminal_set_colors(VTE_TERMINAL(terminal), NULL, NULL, palette, 8);
@@ -486,6 +563,7 @@ static void usage(void) {
     printf("        -s <size>     font size\n");
     printf("        -t <encoding> terminal encoding\n");
     printf("        -v            print version and exit\n");
+    printf("        -y <float>    keyboard height modifier");
     exit(0);
 }
 
@@ -592,19 +670,24 @@ gint main(gint argc, gchar **argv) {
     
     gint c = -1;
     gint i = 0;
+    gfloat f = 1;
     gchar *command = NULL;
     gchar *envv[TERM_ARGS_MAX] = { NULL };
     gint envc = 0;
 #ifdef KINDLE
-    // modify buttons style (gtk+ 2)
-    inject_gtkrc();
     // set short prompt
     envv[envc++] = "PS1=[\\W]\\$ ";
     // set terminfo path
     envv[envc++] = "TERMINFO=" TERMINFO_PATH;
 #endif
-    while((c = getopt(argc, argv, "c:de:E:f:hk:l:o:s:t:v")) != -1) {
+    while((c = getopt(argc, argv, "c:de:E:f:hk:l:o:s:t:vy:")) != -1) {
         switch(c) {
+            case 'c':
+                i = atoi(optarg);
+                if ((i == TRUE) | (i == FALSE)) {
+                    conf->color_reversed = i;
+                }
+                break;
             case 'd':
                 debug = TRUE;
                 break;
@@ -616,23 +699,25 @@ gint main(gint argc, gchar **argv) {
                     envv[envc++] = optarg;
                 }
                 break;
-            case 'c':
-                i = atoi(optarg);
-                if ((i == TRUE) | (i == FALSE)) { conf->color_reversed = i; }
-                break;
             case 'k':
                 i = atoi(optarg);
-                if ((i == TRUE) | (i == FALSE)) { conf->kb_on = i; }
+                if ((i == TRUE) | (i == FALSE)) {
+                    conf->kb_on = i;
+                }
                 break;
             case 'l':
                 snprintf(conf->kb_conf_path, sizeof(conf->kb_conf_path), "%s", optarg);
                 break;
             case 'o':
-                if (optarg[0] == 'U' || optarg[0] == 'R' || optarg[0] == 'L') { conf->orientation = optarg[0]; }
+                if (optarg[0] == 'U' || optarg[0] == 'R' || optarg[0] == 'L') {
+                    conf->orientation = optarg[0];
+                }
                 break;
             case 's':
                 i = atoi(optarg);
-                if (i > 0) conf->font_size = (guint) i;
+                if (i > 0) {
+                    conf->font_size = (guint) i;
+                };
                 break;
             case 'f':
                 snprintf(conf->font_family, sizeof(conf->font_family), "%s", optarg);
@@ -645,6 +730,12 @@ gint main(gint argc, gchar **argv) {
                 break;
             case 'v':
                 version();
+                break;
+            case 'y':
+                f = strtod(optarg, NULL);
+                if (f > 0) {
+                    conf->kb_height_mod = (gfloat) f;
+                }
                 break;
         }
     }
@@ -665,9 +756,8 @@ gint main(gint argc, gchar **argv) {
     // main window
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), TITLE);
+    gtk_widget_set_name(window, "ktermWindow");
 #ifdef KINDLE
-    // modify buttons style (gtk+ 3)
-    inject_styles();
     gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
 #endif
     // box

@@ -26,6 +26,9 @@
 #include "keyboard.h"
 #include "config.h"
 
+/** Global config */
+extern KTconf *conf;
+
 #if GTK_CHECK_VERSION(3,0,0)
 /** 
  * Get gdk keyboard device
@@ -229,13 +232,6 @@ gboolean keyboard_set_size(gpointer data) {
     GtkStyle *style = gtk_widget_get_style(first);
     unit_wmin += (guint) (2 * style->xthickness);
     unit_hmin += (guint) (2 * style->ythickness);
-    GtkBorder *border = NULL;
-    gtk_widget_style_get(first, "inner-border", &border, NULL);
-    if (border) {
-        unit_wmin += (guint) (border->left + border->right);
-        unit_hmin += (guint) (border->top + border->bottom);
-        gtk_border_free(border);
-    }
 #endif
     guint unit_w = MAX(unit_wmax, unit_wmin);
     D printf("wmin: %d, wmax: %d => %d\n", unit_wmin, unit_wmax, unit_w);
@@ -279,7 +275,7 @@ gboolean keyboard_set_size(gpointer data) {
         unit_h = unit_hpref;
     }
     D printf("hmin: %d, hmax: %d, pref: %d => %d\n", unit_hmin, unit_hmax, unit_hpref, unit_h);
-    gint kb_height = (gint) (unit_h * keyboard->row_count);
+    gint kb_height = (gint) (unit_h * keyboard->row_count * conf->kb_height_mod);
     D printf("keyboard size: %ix%i\n", kb_width, kb_height);
     gtk_widget_set_size_request(keyboard_box, -1, kb_height);
     return FALSE;

@@ -102,6 +102,7 @@ extern gboolean debug;
 /** Kterm config */
 typedef struct {
     gboolean kb_on; /** Keyboard visibility */
+    gfloat kb_height_mod; /** Keyboard height modifier */
     gboolean color_reversed; /** Color scheme, is reversed */
     gchar font_family[50]; /** Terminal font family */
     guint font_size;  /** Terminal font size */

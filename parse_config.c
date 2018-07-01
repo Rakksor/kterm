@@ -61,6 +61,7 @@ KTconf *parse_config(void) {
     
     // defaults
     conf->kb_on = 1;
+    conf->kb_height_mod = 1;
     conf->color_reversed = FALSE;
     conf->font_size = VTE_FONT_SIZE;
     snprintf(conf->font_family, sizeof(conf->font_family), "%s", VTE_FONT_FAMILY);
@@ -83,6 +84,14 @@ KTconf *parse_config(void) {
             if (kb_on == 0 || kb_on == 1) {
                 conf->kb_on = kb_on;
                 D printf("kb_on = %i\n", conf->kb_on);
+            }
+        }
+        if (!strncmp(buf, "kb_height_mod", 13)) {
+            gfloat kb_height_mod = 1;
+            sscanf(buf, "kb_height_mod = %f", &kb_height_mod);
+            if (kb_height_mod > 0) {
+                conf->kb_height_mod = kb_height_mod;
+                D printf("kb_height_mod = %f\n", conf->kb_height_mod);
             }
         }
         else if (!strncmp(buf, "color_scheme", 12)) {

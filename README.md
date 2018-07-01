@@ -43,6 +43,7 @@ Usage: kterm [OPTIONS]
         -s <size>     font size
         -t <encoding> terminal encoding
         -v            print version and exit
+        -y <float>    keyboard height modifier
 ```
 
 For a list of what constitutes valid encodings, check [this list][iana-character-sets] or the list returned by `iconv -l`.
@@ -53,6 +54,7 @@ For a list of what constitutes valid encodings, check [this list][iana-character
 ![kterm landscape mode][screenshot3]
 
 #### Changelog
+  * *fork* : newly added in this fork: option for setting keyboard height, automatic dark keyboard theme when switching color scheme, flat keyboard theme, improved layouts using only unicode characters and an additional landscape layout with split keyboard
   * **2.5**: option for setting terminal encoding
   * **2.4**: fix: some special keys won't work, add path to terminfo in Kindle start script
   * **2.3**: fix: issue with uneven keyboard rows height, unresponsivness when popup menu is cancelled, autotools build and other minor bugs
